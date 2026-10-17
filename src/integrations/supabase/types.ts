@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          after_discount: number
+          big_order_discount: number
+          created_at: string
+          customer_name: string
+          delivery: number
+          final_total: number
+          happy_hour_discount: number
+          id: string
+          is_student: boolean
+          items: Json
+          main_discount_type: string
+          order_hour: number
+          service_fee: number
+          student_discount: number
+          subtotal: number
+          total_discount: number
+        }
+        Insert: {
+          after_discount: number
+          big_order_discount: number
+          created_at?: string
+          customer_name: string
+          delivery: number
+          final_total: number
+          happy_hour_discount: number
+          id?: string
+          is_student?: boolean
+          items: Json
+          main_discount_type: string
+          order_hour: number
+          service_fee: number
+          student_discount: number
+          subtotal: number
+          total_discount: number
+        }
+        Update: {
+          after_discount?: number
+          big_order_discount?: number
+          created_at?: string
+          customer_name?: string
+          delivery?: number
+          final_total?: number
+          happy_hour_discount?: number
+          id?: string
+          is_student?: boolean
+          items?: Json
+          main_discount_type?: string
+          order_hour?: number
+          service_fee?: number
+          student_discount?: number
+          subtotal?: number
+          total_discount?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
