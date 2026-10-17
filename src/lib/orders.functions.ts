@@ -14,7 +14,8 @@ const schema = z.object({
         qty: z.number().int().min(1).max(1000),
       }),
     )
-    .length(3),
+    .min(1)
+    .max(100),
 });
 
 export const placeOrder = createServerFn({ method: "POST" })
