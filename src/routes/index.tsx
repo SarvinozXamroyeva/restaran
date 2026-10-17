@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, X, Receipt, Clock, GraduationCap, Truck, Sparkles, Loader2 } from "lucide-react";
+import { Check, X, Receipt, Clock, GraduationCap, Truck, Sparkles, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { calculateOrder, type OrderResult } from "@/lib/order-calc";
-import { placeOrder, listOrders } from "@/lib/orders.functions";
+import { placeOrder } from "@/lib/orders.functions";
 import hero from "@/assets/hero.jpg";
 
 export const Route = createFileRoute("/")({
@@ -35,6 +35,16 @@ const MENU = [
   { name: "Lag'mon", price: 38000 },
   { name: "Shashlik", price: 25000 },
   { name: "Ko'k choy", price: 8000 },
+  { name: "Manti", price: 35000 },
+  { name: "Chuchvara", price: 30000 },
+  { name: "Norin", price: 40000 },
+  { name: "Qozon kabob", price: 55000 },
+  { name: "Dimlama", price: 42000 },
+  { name: "Mastava", price: 28000 },
+  { name: "Shurva", price: 32000 },
+  { name: "Achchiq-chuchuk", price: 15000 },
+  { name: "Non", price: 5000 },
+  { name: "Kompot", price: 10000 },
 ];
 
 function Index() {
@@ -49,16 +59,12 @@ function Index() {
   const [result, setResult] = useState<OrderResult | null>(null);
 
   const preview = calculateOrder({ customerName: name, hasStudentId: student, orderHour: hour, items });
-  const qc = useQueryClient();
   const place = useServerFn(placeOrder);
-  const list = useServerFn(listOrders);
-  const history = useQuery({ queryKey: ["orders"], queryFn: () => list() });
 
   const mutation = useMutation({
     mutationFn: () => place({ data: { customerName: name, hasStudentId: student, orderHour: hour, items } }),
     onSuccess: (r) => {
       setResult(r);
-      qc.invalidateQueries({ queryKey: ["orders"] });
       toast.success("Buyurtma saqlandi!");
       setTimeout(() => document.getElementById("chek")?.scrollIntoView({ behavior: "smooth" }), 50);
     },
@@ -99,7 +105,7 @@ function Index() {
             <div className="mt-6 grid gap-6 md:grid-cols-2">
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="name">Ism</Label>
-                <Input id="name" placeholder="Masalan, Umrbek" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} className="h-12 text-base" />
+                <Input id="name" placeholder="Sarvinoz" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} className="h-12 text-base" />
               </div>
               <div className="flex items-center justify-between rounded-2xl border bg-secondary p-4">
                 <div className="flex items-center gap-3">
@@ -125,12 +131,12 @@ function Index() {
           </div>
 
           <div className="rounded-3xl border bg-card p-6 md:p-8">
-            <div className="flex items-end justify-between">
-              <h2 className="text-2xl font-semibold">3 ta taom</h2>
-              <div className="hidden flex-wrap gap-2 md:flex">
+            <div>
+              <h2 className="text-2xl font-semibold">Taomlar ({items.length})</h2>
+              <div className="mt-4 flex flex-wrap gap-2">
                 {MENU.map((m) => (
                   <button key={m.name} type="button" className="rounded-full border px-3 py-1 text-xs text-muted-foreground transition hover:border-primary hover:text-primary"
-                    onClick={() => setItems((arr) => { const i = arr.findIndex((x) => !x.name); const idx = i === -1 ? 2 : i; return arr.map((it, j) => (j === idx ? { ...m, qty: 1 } : it)); })}>
+                    onClick={() => setItems((arr) => { const i = arr.findIndex((x) => x.name === m.name); return i === -1 ? [...arr, { ...m, qty: 1 }] : arr.map((it, j) => (j === i ? { ...it, qty: it.qty + 1 } : it)); })}>
                     + {m.name}
                   </button>
                 ))}
@@ -138,14 +144,23 @@ function Index() {
             </div>
             <div className="mt-6 space-y-4">
               {items.map((it, i) => (
-                <div key={i} className="grid grid-cols-[auto_1fr] gap-3 rounded-2xl border bg-secondary p-4 md:grid-cols-[auto_2fr_1.3fr_0.8fr_auto] md:items-end">
+                <div key={i} className="grid grid-cols-[auto_1fr] gap-3 rounded-2xl border bg-secondary p-4 md:grid-cols-[auto_2fr_1.3fr_0.8fr_auto_auto] md:items-end">
                   <span className="row-span-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-saffron font-display font-bold text-primary-foreground md:row-span-1">{i + 1}</span>
                   <div className="space-y-1"><Label className="text-xs text-muted-foreground">Taom nomi</Label><Input value={it.name} maxLength={60} onChange={(e) => upd(i, "name", e.target.value)} /></div>
                   <div className="space-y-1 col-start-2 md:col-start-auto"><Label className="text-xs text-muted-foreground">Narxi (so'm)</Label><Input type="number" min={0} value={it.price} onChange={(e) => upd(i, "price", e.target.value)} /></div>
                   <div className="space-y-1 col-start-2 md:col-start-auto"><Label className="text-xs text-muted-foreground">Miqdori</Label><Input type="number" min={1} value={it.qty} onChange={(e) => upd(i, "qty", e.target.value)} /></div>
                   <p className="col-start-2 text-right font-semibold text-primary md:col-start-auto md:pb-2">{som(it.price * it.qty)}</p>
+                  <button type="button" aria-label="Taomni o'chirish" disabled={items.length <= 1}
+                    onClick={() => setItems((arr) => arr.filter((_, j) => j !== i))}
+                    className="col-start-2 justify-self-end rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-destructive disabled:opacity-30 md:col-start-auto md:mb-1">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               ))}
+              <button type="button" onClick={() => setItems((arr) => [...arr, { name: "", price: 0, qty: 1 }])}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed py-4 text-muted-foreground transition hover:border-primary hover:text-primary">
+                <Plus className="h-4 w-4" /> Taom qo'shish
+              </button>
             </div>
           </div>
         </div>
@@ -173,31 +188,6 @@ function Index() {
 
       {result && <ReceiptView r={result} />}
 
-      <section className="mx-auto max-w-6xl px-6 pb-24">
-        <h2 className="text-3xl font-semibold">So'nggi buyurtmalar</h2>
-        <div className="mt-6 overflow-hidden rounded-3xl border bg-card">
-          {history.isLoading ? (
-            <p className="p-6 text-muted-foreground">Yuklanmoqda…</p>
-          ) : !history.data?.length ? (
-            <p className="p-6 text-muted-foreground">Hozircha buyurtmalar yo'q. Birinchi bo'ling!</p>
-          ) : (
-            <ul className="divide-y">
-              {history.data.map((o) => (
-                <li key={o.id} className="flex flex-wrap items-center justify-between gap-2 px-6 py-4">
-                  <div>
-                    <p className="font-medium">{o.customer_name} {o.is_student && <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-xs text-primary">talaba</span>}</p>
-                    <p className="text-xs text-muted-foreground">{String(o.order_hour).padStart(2, "0")}:00 · {new Date(o.created_at).toLocaleString("uz-UZ")}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-display text-lg font-semibold">{som(Number(o.final_total))}</p>
-                    <p className="text-xs text-success">tejaldi {som(Number(o.total_discount))}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
     </main>
   );
 }
