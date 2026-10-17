@@ -116,7 +116,7 @@ function Index() {
                   <span className="flex items-center gap-2 font-medium"><Clock className="h-5 w-5 text-primary" /> Buyurtma vaqti</span>
                   <span className="font-display text-xl font-semibold">{String(hour).padStart(2, "0")}:00</span>
                 </div>
-                <Slider min={0} max={23} step={1} value={[hour]} onValueChange={(v) => setHour(v[0])} aria-label="Buyurtma vaqti" />
+                <Slider min={0} max={23} step={1} value={[hour]} onValueChange={(v) => setHour(v[0] ?? 0)} aria-label="Buyurtma vaqti" />
                 <p className={`mt-2 text-xs ${preview.happyHourEligible ? "text-success" : "text-muted-foreground"}`}>
                   {preview.happyHourEligible ? "Baxtli soat faol! −20%" : "Baxtli soat: 14:00 – 17:00"}
                 </p>
