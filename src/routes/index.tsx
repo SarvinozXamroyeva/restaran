@@ -12,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { calculateOrder, type OrderResult } from "@/lib/order-calc";
 import { placeOrder } from "@/lib/orders.functions";
 import hero from "@/assets/hero.jpg";
+import { DishCarousel } from "@/components/DishCarousel";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -187,6 +188,8 @@ function Index() {
       </section>
 
       {result && <ReceiptView r={result} />}
+
+      <DishCarousel />
 
     </main>
   );
